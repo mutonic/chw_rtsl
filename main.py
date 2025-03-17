@@ -81,15 +81,8 @@ st.sidebar.markdown("---")
 st.title("📍 eCHIS Community Health Worker Dashboard")
 st.markdown("---")
 
-# Top Metrics Cards
-st.markdown("## 🔹 Summary Statistics")
-col1, col2, col3 = st.columns(3)
-col1.metric("📋 Total Forms Submitted", len(df_filtered))
-col2.metric("👥 Unique CHWs Interviewed", df_filtered['group_lx1ft50/Amazina_y_umujyanama'].nunique())
-col3.metric("📆 Date Range", f"{df_filtered['Submission Date'].min()} - {df_filtered['Submission Date'].max()}")
-
 # 📊 Summary Section
-st.markdown("## 🔹 Summary Overview")
+st.markdown("## 🔹 Summary Table")
 
 # Check if required columns exist in the dataset
 required_columns = [
@@ -128,6 +121,13 @@ else:
     st.warning("Some required columns are missing in the dataset.")
 
 st.markdown("---")
+
+# Top Metrics Cards
+st.markdown("## 🔹 Summary Statistics")
+col1, col2, col3 = st.columns(3)
+col1.metric("📋 Total Forms Submitted", len(df_filtered))
+col2.metric("👥 Unique CHWs Interviewed", df_filtered['group_lx1ft50/Amazina_y_umujyanama'].nunique())
+col3.metric("📆 Data Completion Rate", f"{(total_villages/144)*100}%")
 
 # 📈 Form Submission Trend
 st.markdown("## 🔹 Submission Trends")
