@@ -109,7 +109,7 @@ if all(col in df_filtered.columns for col in required_columns):
     total_villages = summary_df['N° of Villages'].sum()
 
     # Append the total row with bold formatting
-    total_row = pd.DataFrame([['**Total**', '', f'**{total_chws}**', total_villages]], 
+    total_row = pd.DataFrame([['**Total**', '', total_villages], f'**{total_chws}**'], 
                               columns=summary_df.columns)
     
     summary_df = pd.concat([summary_df, total_row], ignore_index=True)
