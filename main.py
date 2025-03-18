@@ -65,9 +65,9 @@ selected_gender = st.sidebar.radio("Filter by Gender", gender_options)
 if selected_gender == "Both":
     df_filtered = df
 elif selected_gender == "Gabo":
-    df_filtered = df[df['Igitsina'] == 'Gabo']
+    df_filtered = df[df['group_lx1ft50/Igitsina'] == 'Gabo']
 elif selected_gender == "Gore":
-    df_filtered = df[df['Igitsina'] == 'Gore']
+    df_filtered = df[df['group_lx1ft50/Igitsina'] == 'Gore']
 
 # Date filtering
 start_date = st.sidebar.date_input("Start Date", df_filtered['Submission Date'].min())
