@@ -93,11 +93,11 @@ if not df_filtered.empty:
 st.sidebar.markdown("---")
 
 # Main Dashboard Layout
-st.title("📍 eCHIS Community Health Worker Dashboard")
+st.title("📍 eCHIS Monitoring Dashboard")
 st.markdown("---")
 
 # 📊 Summary Section
-st.markdown("## 🔹 Summary Table")
+st.markdown("## Number of CHWs interviewed by Health centers")
 
 # Check if required columns exist in the dataset
 required_columns = [
@@ -124,7 +124,7 @@ if all(col in df_filtered.columns for col in required_columns):
     total_villages = summary_df['N° of Villages'].sum()
 
     # Append the total row
-    total_row = pd.DataFrame([['Total', '', total_chws, total_villages]], 
+    total_row = pd.DataFrame([['Total', '', total_villages, total_chws]], 
                               columns=summary_df.columns)
     summary_df = pd.concat([summary_df, total_row], ignore_index=True)
 
@@ -139,9 +139,45 @@ st.markdown("---")
 # Top Metrics Cards
 st.markdown("## 🔹 Summary Statistics")
 col1, col2, col3 = st.columns(3)
-col1.metric("📋 Total Forms Submitted", len(df_filtered))
+col1.metric("📋 Total Number of Submissions", len(df_filtered))
 col2.metric("👥 Unique CHWs Interviewed", df_filtered['group_lx1ft50/Amazina_y_umujyanama'].nunique())
-col3.metric("📆 Data Completion Rate", f"{(total_villages/144)*100}%")
+col3.metric("📆 Data Completion Rate", f"{round((total_villages/144)*100,2)}%")
+
+
+# 📈 Form Submission Trend
+st.markdown("## 🔹 Submission Trends")
+
+# Ensure 'Submission Date' is in correct datetime format
+df_filtered['Submission Date'] = pd.to_datetime(df_filtered['Submission Date'], errors='coerce').dt.date
+
+# Group data correctly by Date (removing duplicates)
+df_trend = df_filtered.groupby('Submission Date', as_index=False).size()
+
+# Sort by date to prevent X-axis misalignment
+df_trend = df_trend.sort_values(by='Submission Date')
+
+# Format text labels to be bold
+df_trend['size_bold'] = df_trend['size'].apply(lambda x: f"<b>{x}</b>")
+
+# Create the line chart
+fig = px.line(df_trend, x='Submission Date', y='size',
+              title='📈 Trend of Form Submissions Over Time',
+              markers=True, text='size_bold')
+
+# Ensure date formatting is only Day-Month-Year (without time)
+fig.update_xaxes(
+    tickformat="%d-%m-%Y",
+    dtick="D1"  # Ensures daily intervals for dates
+)
+
+# Ensure text labels are visible and bold
+fig.update_traces(
+    textposition="top center",
+    textfont=dict(size=14, color="white", family="Arial Black")  # Make numbers bold
+)
+
+# Display the chart
+st.plotly_chart(fig, use_container_width=True)
 
 
 # 📊 Key Insights Section
@@ -153,7 +189,7 @@ if gender_col in df_filtered.columns:
     gender_counts = df_filtered[gender_col].value_counts().reset_index()
     gender_counts.columns = ['Gender', 'Count']
 
-    col1.markdown("### 🏥 Gender Distribution")
+    col1.markdown("### 🏥 Number of CHWs interviewed by Health centers")
     fig = px.bar(gender_counts, x='Gender', y='Count', title="🏥 Gender Distribution", text_auto=True)
     col1.plotly_chart(fig)
 
@@ -187,3 +223,17 @@ if digital_lit_col in df_filtered.columns:
     fig = px.bar(x=digital_lit_summary.index, y=digital_lit_summary.values, title="📱 eCHIS Influence on Digital Literacy", text_auto=True)
     col2.plotly_chart(fig)
 
+# Technical Challenges Summary
+st.markdown("## 🔹 Technical difficulties/ challenges when using eCHIS for reporting")
+tech_challenges_col = 'group_xc3oo49/Ni_izihe_mbogamizi_za_tekiniki'
+
+if tech_challenges_col in df_filtered.columns:
+    # Split multiple-answer responses into separate entries
+    all_responses = df_filtered[tech_challenges_col].dropna().str.split(" ").explode()
+    challenge_counts = Counter(all_responses)
+    challenge_df = pd.DataFrame(challenge_counts.items(), columns=['Challenge', 'Count']).sort_values(by='Count', ascending=False)
+    total_tech_challenges = challenge_df['Count'].sum()
+
+    st.metric("⚠️ Total CHWs Reporting Technical Challenges in eCHIS", total_tech_challenges)
+    fig = px.bar(challenge_df, x='Challenge', y='Count', title="Technical Challenges Faced", text_auto=True)
+    st.plotly_chart(fig)
