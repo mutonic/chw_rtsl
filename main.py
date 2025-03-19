@@ -59,6 +59,46 @@ if not df_filtered.empty:
 st.title("📍 eCHIS Monitoring Dashboard")
 st.markdown("---")
 
+# 📊 Summary Section
+st.markdown("## Number of CHWs interviewed by Health centers")
+
+# Check if required columns exist in the dataset
+required_columns = [
+    'group_lx1ft50/akarere', 
+    'group_lx1ft50/ikigonderabuzima', 
+    'group_lx1ft50/Amazina_y_umujyanama', 
+    'group_lx1ft50/umudugudu'
+]
+
+if all(col in df_filtered.columns for col in required_columns):
+    # Group and aggregate data
+    summary_df = df_filtered.groupby(
+        ['group_lx1ft50/akarere', 'group_lx1ft50/ikigonderabuzima']
+    ).agg(
+        N_CHW=('group_lx1ft50/Amazina_y_umujyanama', 'nunique'),
+        N_Villages=('group_lx1ft50/umudugudu', 'nunique')
+    ).reset_index()
+
+    # Rename columns
+    summary_df.columns = ['District', 'Health Center', 'N° of CHWs', 'N° of Villages']
+
+    # Compute totals
+    total_chws = summary_df['N° of CHWs'].sum()
+    total_villages = summary_df['N° of Villages'].sum()
+
+    # Append the total row
+    total_row = pd.DataFrame([['Total', '', total_villages, total_chws]], 
+                              columns=summary_df.columns)
+    summary_df = pd.concat([summary_df, total_row], ignore_index=True)
+
+    # Display the table correctly
+    st.dataframe(summary_df)
+    
+else:
+    st.warning("Some required columns are missing in the dataset.")
+
+st.markdown("---")
+
 # Top Metrics Cards
 col1, col2, col3 = st.columns(3)
 col1.metric("📋 Total Number of Submissions", len(df_filtered))
