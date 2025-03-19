@@ -167,7 +167,7 @@ if tech_challenges_col in df_filtered.columns:
     all_responses = df_filtered[tech_challenges_col].dropna().str.split(" ").explode()
     challenge_counts = Counter(all_responses)
     challenge_df = pd.DataFrame(challenge_counts.items(), columns=['Challenge', 'Count']).sort_values(by='Count', ascending=False)
-    st.plotly_chart(px.bar(challenge_df, x='Challenge', y='Count', title="Technical Challenges in eCHIS"))
+    st.plotly_chart(px.bar(challenge_df, x='Challenge', y='Count', title="Technical Challenges in eCHIS", text='Count'))
 
 # 📊 **Module 3: Decision Making & Service Delivery**
 st.markdown("## Module 3: Decision Making & Service Delivery")
@@ -181,16 +181,30 @@ if decision_col in df_filtered.columns:
     col1.plotly_chart(fig)
 
 # # 📊 **Module 4: Training & Support**
-# st.markdown("## Module 4: Training & Support")
+# Technical Challenges in eCHIS 4.2
+st.markdown("## Module 4: Training & Support")
 
-# training_satisfaction_col = "group_xc3oo49/Ese_eCHIS_yaba_yaragize_icyo_i"
-# if training_satisfaction_col in df_filtered.columns:
-#     satisfaction_counts = df_filtered[training_satisfaction_col].value_counts().reset_index()
-#     satisfaction_counts.columns = ['Satisfaction Level', 'Count']
+col1, col2 = st.columns(2)
+training_satisfaction_col = "group_hl7oa32/_4_2_Niba_ari_yego_E_nyuze_ku_ruhe_rugero"
+if training_satisfaction_col in df_filtered.columns:
+    satisfaction_counts = df_filtered[training_satisfaction_col].value_counts().reset_index()
+    satisfaction_counts.columns = ['Satisfaction Level', 'Count']
     
-#     fig = px.bar(satisfaction_counts, x='Satisfaction Level', y='Count',
-#                  title="Level of Satisfaction with eCHIS Training", text_auto=True)
-#     col2.plotly_chart(fig)
+    fig = px.bar(satisfaction_counts, x='Satisfaction Level', y='Count',
+                 title="Level of Satisfaction with eCHIS Training", text_auto=True)
+    col1.plotly_chart(fig)
+
+col1.markdown("---")
+
+# Technical Challenges in eCHIS 4.4
+training_needs_col = 'group_hl7oa32/Ni_ubuhe_bufasha_bwiyongera_bw'
+if training_needs_col in df_filtered.columns:
+    all_responses = df_filtered[training_needs_col].dropna().str.split(" ").explode()
+    challenge_counts = Counter(all_responses)
+    challenge_df = pd.DataFrame(challenge_counts.items(), columns=['Challenge', 'Count']).sort_values(by='Count', ascending=False)
+    col2.plotly_chart(px.bar(challenge_df, x='Challenge', y='Count', title="Technical Challenges in eCHIS", text='Count'))
+
+col2.markdown("---")
 
 # 📊 **Module 5: Digital Literacy & Women's Health**
 st.markdown("## Module 5: Digital Literacy & Women's Health")
